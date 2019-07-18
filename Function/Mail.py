@@ -9,13 +9,14 @@ from System import Paths
 class Mail:
     @staticmethod
     def send_mail(mail_title, mail_content):
-        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "smtp"), "r") as file:
+        a = Paths.PATH_FULL_SYS_LOCATION
+        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/smtp"), "r") as file:
             smtp_server = file.read()
-        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "password"), "r") as file:
+        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/password"), "r") as file:
             pwd = file.read()
-        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "sender"), "r") as file:
+        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/sender"), "r") as file:
             sender = file.read()
-        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "receiver", "r")) as file:
+        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/receiver"), "r") as file:
             receiver = file.read()
 
         # ssl登录

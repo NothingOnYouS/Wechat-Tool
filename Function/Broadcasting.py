@@ -25,7 +25,7 @@ class Broadcasting:
     info_exit = prefix + "群发模式已退出。"
     info_remove = prefix + "已移除：  %s"
 
-    def prepare(self, content_list):
+    def broadcasting_prepare(self, content_list):
         self.content = content_list.pop()
         users_dict = itchat.get_friends(update=True)
         for user in users_dict:
@@ -36,13 +36,13 @@ class Broadcasting:
             func()
         if len(self.udict_fin) > 0:
             self.__send_target_users()
-            return True
+            return "TRUE"
         else:
             print(Broadcasting.warn_no_receiver)
-            return False
+            return "FALSE"
 
-    def broadcasting_confirm(self, uin):
-
+    def broadcasting_confirm(self, msg):
+        uin = msg.Content
         if len(self.udict_fin) == 0:
             itchat.send(Broadcasting.warn_no_receiver, 'filehelper')
             return "FALSE"
