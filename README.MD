@@ -50,9 +50,9 @@
                  再从所有联系人列表中找到包含`辅导员`的联系人加入到结果列表中。<br>
              * 发送<br>
              `群发|这是一条 ！除！歌唱班，表演班的 ！男班长！ 和 ！所有辅导员！ 要注意的信息|去除：@歌唱班@表演班|仅包括：@班长@男|加上：辅导员`<br>
-         ![demo_command](https://github.com/kzmain/Wechat-Tool/blob/master/demo/%E7%BE%A4%E5%8F%91%E5%8A%A9%E6%89%8B%20%E7%BE%A4%E5%8F%91%E5%91%BD%E4%BB%A4.png?raw=true)
+         ![demo_command](./demo/群发助手_群发命令.png)
 3. 群助手发送回即群发联系人列表，回复数字删去对应联系人直到确认群发人员，回复Y群发消息，回复N退出群发模式<br>
-    ![demo_confirm](https://github.com/kzmain/Wechat-Tool/blob/master/demo/%E7%BE%A4%E5%8F%91%E5%8A%A9%E6%89%8B%20%E7%A1%AE%E8%AE%A4%E4%BA%BA%E5%91%98.png?raw=true)
+    ![demo_confirm](./demo/群发助手_确认人员.png)
     
     
     
