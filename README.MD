@@ -7,7 +7,7 @@
 
 # 使用指导
 ## 微信值守
-1. 请正确配置如下文件：
+1. 请正确配置如下文件（如不正确配置，邮箱收不到未读信息）：
     1. `Config/sender`: 发送消息的邮箱
     2. `Config/password`: 发送消息的邮箱的密码
     4. `Config/smtp`: 发送消息的邮箱`smtp`配置
@@ -50,8 +50,9 @@
             再从所有联系人列表中找到包含`辅导员`的联系人加入到结果列表中。
         * 发送
         `群发|这是一条 除歌唱班，表演班的 男班长 和 辅导员 要注意的信息|去除：@歌唱班@表演班|仅包括：@班长@男|加上：辅导员`
+    ![demo_command](https://github.com/kzmain/Wechat-Tool/blob/master/demo/%E7%BE%A4%E5%8F%91%E5%8A%A9%E6%89%8B%20%E7%BE%A4%E5%8F%91%E5%91%BD%E4%BB%A4.png?raw=true)
 3. 群助手发送回即群发联系人列表，回复数字删去对应联系人直到确认群发人员，回复Y群发消息，回复N退出群发模式
-
+    ![demo_confirm](https://github.com/kzmain/Wechat-Tool/blob/master/demo/%E7%BE%A4%E5%8F%91%E5%8A%A9%E6%89%8B%20%E7%A1%AE%E8%AE%A4%E4%BA%BA%E5%91%98.png?raw=true)
     
     
     
