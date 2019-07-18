@@ -9,7 +9,6 @@ from System import Paths
 class Mail:
     @staticmethod
     def send_mail(mail_title, mail_content):
-        a = Paths.PATH_FULL_SYS_LOCATION
         with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/smtp"), "r") as file:
             smtp_server = file.read()
         with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/password"), "r") as file:

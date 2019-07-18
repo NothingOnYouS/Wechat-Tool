@@ -1,5 +1,6 @@
 import os
 import random
+import smtplib
 import time
 import threading
 
@@ -54,7 +55,7 @@ class AutoReply:
                     modal = AutoReply.modal[random.randint(0, len(AutoReply.modal)) - 1]
                     sentence = AutoReply.sentences[random.randint(0, len(AutoReply.sentences) - 1)]
                     itchat.send(prefix + modal+sentence, uid)
-            except itchat:
+            except (TypeError, smtplib.SMTPServerDisconnected):
                 itchat.send(AutoReply.first_prefix + "我，我，我，我走丢了，大哭😭。我找不到我主人了。", uid)
                 return (AutoReply.other_prefix + "唔，你要是急着找主人的话，请电话直接联系+8615900668803。[可怜]").format(msg['Text'])
         else:
@@ -64,13 +65,14 @@ class AutoReply:
                 AutoReply.history_message[uid]["MESSAGES"].append(msg.Content)
             if AutoReply.check_thread is None:
                 AutoReply.check_thread = threading.Thread(target=AutoReply.__check_update, args=())
+                AutoReply.check_thread.start()
 
     @staticmethod
     def __pre_get_wait_length():
         if WeSys.auto_reply_wait_min is None:
             with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/auto_reply_wait_min"), "r") as file:
                 try:
-                    WeSys.auto_reply_wait_min = int(file.read())
+                    WeSys.auto_reply_wait_min = float(file.read())
                     if WeSys.auto_reply_wait_min < 0:
                         WeSys.auto_reply_wait_min = 10
                 except:
@@ -80,10 +82,12 @@ class AutoReply:
     def __check_update():
         while True:
             wait_sec = float(float(time.time() - WeSys.last_time))
+            a = WeSys.auto_reply_wait_min * 60
             if wait_sec > WeSys.auto_reply_wait_min * 60:
                 wait_sec = WeSys.auto_reply_wait_min * 60
             time.sleep(wait_sec + 1)
             last_now_len = float(float(time.time() - WeSys.last_time) / 60)
+            a = AutoReply.history_message
             if last_now_len > WeSys.auto_reply_wait_min:
                 if len(AutoReply.history_message) > 0:
                     for uid, uid_dict in AutoReply.history_message.items():
@@ -100,7 +104,7 @@ class AutoReply:
                                 sentence = AutoReply.sentences[random.randint(0, len(AutoReply.sentences) - 1)]
                                 itchat.send(AutoReply.other_prefix + AutoReply.first_prefix + "主人似乎长时间离开微信了，我来替他看微信啦！", uid)
                                 itchat.send(AutoReply.other_prefix + "唔，你要是急着找主人的话，请电话直接联系+8615900668803。[Hey]", uid)
-                                itchat.send(AutoReply.other_prefix + "诶，有消息。" + sentence, uid)
+                                itchat.send(AutoReply.other_prefix + sentence, uid)
                             except itchat:
                                 itchat.send(AutoReply.first_prefix + "我，我，我，我走丢了，大哭😭。我找不到我主人了。", uid)
                                 itchat.send(AutoReply.other_prefix + "唔，你要是急着找主人的话，请电话直接联系+8615900668803。[可怜]", uid)
