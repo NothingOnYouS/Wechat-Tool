@@ -14,6 +14,8 @@ class WeSys:
                      "broadcasting_confirm": {"TRUE": None, "CONTINUE": "broadcasting_confirm", "FALSE": None}}
 
     auto_reply_wait_min = None
+    auto_reply_boot_name = None
+    auto_reply_contact_method = None
 
     @staticmethod
     def fh_start_new_task(task, argv):

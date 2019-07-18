@@ -14,8 +14,8 @@ from WeSys import WeSys
 class AutoReply:
     history_message = {}
     check_thread = None
-    first_prefix = "我是小小开，"
-    other_prefix = "(小小开)"
+    first_prefix = None
+    other_prefix = None
     mail_title = 'Wechat %s 的信息'
     modal = ["哇哦，这样嘛？！", "妈耶！", "嘿嘿～。", "啦啦啦~", "噗～", "嘻嘻～", "矮油～"]
     sentences = ["（悄悄记下来通知主人）📝",
@@ -32,6 +32,8 @@ class AutoReply:
     @staticmethod
     def text_reply(msg):
         AutoReply.__pre_get_wait_length()
+        AutoReply.__pre_get_bot_name()
+        AutoReply.__pre_get_contact_method()
         uname = msg.User["RemarkName"] if msg.User["RemarkName"] != "" else msg.User["NickName"]
         uid = msg.User["UserName"]
         if float(float(time.time() - WeSys.last_time) / 60) > WeSys.auto_reply_wait_min:
@@ -49,7 +51,8 @@ class AutoReply:
                 if first_flag:
                     sentence = AutoReply.sentences[random.randint(0, len(AutoReply.sentences) - 1)]
                     itchat.send(AutoReply.other_prefix + AutoReply.first_prefix + "主人似乎长时间离开微信了，我替他看着微信呢。", uid)
-                    itchat.send(AutoReply.other_prefix + "唔，你要是急着找主人的话，请电话直接联系+8615900668803。[Hey]", uid)
+                    if WeSys.auto_reply_contact_method is not None:
+                        itchat.send(AutoReply.other_prefix + "唔，你要是急着找主人的话，请直接联系 %s。[Hey]" % WeSys.auto_reply_contact_method, uid)
                     itchat.send(AutoReply.other_prefix + "诶，有消息。" + sentence, uid)
                 else:
                     modal = AutoReply.modal[random.randint(0, len(AutoReply.modal)) - 1]
@@ -57,7 +60,8 @@ class AutoReply:
                     itchat.send(prefix + modal+sentence, uid)
             except (TypeError, smtplib.SMTPServerDisconnected):
                 itchat.send(AutoReply.first_prefix + "我，我，我，我走丢了，大哭😭。我找不到我主人了。", uid)
-                return (AutoReply.other_prefix + "唔，你要是急着找主人的话，请电话直接联系+8615900668803。[可怜]").format(msg['Text'])
+                if WeSys.auto_reply_contact_method is not None:
+                    itchat.send(AutoReply.other_prefix + "唔，你要是急着找主人的话，请直接联系 %s。[可怜]" % WeSys.auto_reply_contact_method, uid)
         else:
             if uid not in AutoReply.history_message.keys():
                 AutoReply.history_message[uid] = {"UNAME": uname, "MESSAGES": [msg.Content]}
@@ -75,39 +79,64 @@ class AutoReply:
                     WeSys.auto_reply_wait_min = float(file.read())
                     if WeSys.auto_reply_wait_min < 0:
                         WeSys.auto_reply_wait_min = 10
-                except:
+                except (TypeError, FileNotFoundError):
                     WeSys.auto_reply_wait_min = 10
+
+    @staticmethod
+    def __pre_get_bot_name():
+        if WeSys.auto_reply_boot_name is None:
+            with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/auto_reply_bot_name"), "r") as file:
+                try:
+                    WeSys.auto_reply_boot_name = file.read()
+                    if WeSys.auto_reply_boot_name == "":
+                        WeSys.auto_reply_boot_name = "小机器人"
+                except FileNotFoundError:
+                    WeSys.auto_reply_boot_name = "小机器人"
+                AutoReply.first_prefix = "我是%s，" % WeSys.auto_reply_boot_name
+                AutoReply.other_prefix = "(%s)" % WeSys.auto_reply_boot_name
 
     @staticmethod
     def __check_update():
         while True:
             wait_sec = float(float(time.time() - WeSys.last_time))
-            a = WeSys.auto_reply_wait_min * 60
             if wait_sec > WeSys.auto_reply_wait_min * 60:
                 wait_sec = WeSys.auto_reply_wait_min * 60
             time.sleep(wait_sec + 1)
             last_now_len = float(float(time.time() - WeSys.last_time) / 60)
-            a = AutoReply.history_message
             if last_now_len > WeSys.auto_reply_wait_min:
                 if len(AutoReply.history_message) > 0:
                     for uid, uid_dict in AutoReply.history_message.items():
+                        content = ""
+                        title = AutoReply.mail_title % uid_dict["UNAME"]
                         if len(uid_dict["MESSAGES"]) > 0:
-                            try:
-                                title = AutoReply.mail_title % uid_dict["UNAME"]
-                                content = ""
-                                for message in uid_dict["MESSAGES"]:
-                                    if content == "":
-                                        content += ("%s" % message)
-                                    else:
-                                        content += ("\n%s" % message)
-                                Mail.send_mail(title, content)
-                                sentence = AutoReply.sentences[random.randint(0, len(AutoReply.sentences) - 1)]
-                                itchat.send(AutoReply.other_prefix + AutoReply.first_prefix + "主人似乎长时间离开微信了，我来替他看微信啦！", uid)
-                                itchat.send(AutoReply.other_prefix + "唔，你要是急着找主人的话，请电话直接联系+8615900668803。[Hey]", uid)
-                                itchat.send(AutoReply.other_prefix + sentence, uid)
-                            except itchat:
-                                itchat.send(AutoReply.first_prefix + "我，我，我，我走丢了，大哭😭。我找不到我主人了。", uid)
-                                itchat.send(AutoReply.other_prefix + "唔，你要是急着找主人的话，请电话直接联系+8615900668803。[可怜]", uid)
-                            uid_dict["MESSAGES"].clear()
+                            for message in uid_dict["MESSAGES"]:
+                                if content == "":
+                                    content += ("%s" % message)
+                                else:
+                                    content += ("\n%s" % message)
+                        try:
+
+                            Mail.send_mail(title, content)
+                            sentence = AutoReply.sentences[random.randint(0, len(AutoReply.sentences) - 1)]
+                            itchat.send(AutoReply.other_prefix + AutoReply.first_prefix + "主人似乎长时间离开微信了，我来替他看微信啦！", uid)
+                            itchat.send(AutoReply.other_prefix + "唔，你要是急着找主人的话，请电话直接联系+8615900668803。[Hey]", uid)
+                            itchat.send(AutoReply.other_prefix + sentence, uid)
+                        except itchat:
+                            itchat.send(AutoReply.first_prefix + "我，我，我，我走丢了，大哭😭。我找不到我主人了。", uid)
+                            itchat.send(AutoReply.other_prefix + "唔，你要是急着找主人的话，请电话直接联系+8615900668803。[可怜]", uid)
+                        uid_dict["MESSAGES"].clear()
             else:
                 AutoReply.history_message = {}
+
+    @staticmethod
+    def __pre_get_contact_method():
+        if WeSys.auto_reply_contact_method is None:
+            with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/auto_reply_contact_method"), "r") as file:
+                try:
+                    WeSys.auto_reply_contact_method = file.read()
+                    if WeSys.auto_reply_contact_method == "":
+                        WeSys.auto_reply_contact_method = None
+                except FileNotFoundError:
+                    WeSys.auto_reply_contact_method = None
+
+

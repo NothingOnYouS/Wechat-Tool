@@ -1,7 +1,10 @@
 import os
+import smtplib
 from email.header import Header
 from email.mime.text import MIMEText
 from smtplib import SMTP_SSL
+
+import itchat
 
 from System import Paths
 
@@ -29,3 +32,20 @@ class Mail:
         msg["To"] = receiver
         smtp.sendmail(sender, receiver, msg.as_string())
         smtp.quit()
+
+    @staticmethod
+    def check_mail_server():
+        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/smtp"), "r") as file:
+            smtp_server = file.read()
+        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/password"), "r") as file:
+            pwd = file.read()
+        with open(os.path.join(Paths.PATH_FULL_SYS_LOCATION, "Config/sender"), "r") as file:
+            sender = file.read()
+        try:
+            smtp = SMTP_SSL(smtp_server)
+            smtp.ehlo(smtp_server)
+            smtp.login(sender, pwd)
+            return True
+        except (smtplib.SMTPException, smtplib.SMTPServerDisconnected):
+            itchat.send("邮件配置错误，无法联系到您邮箱，请检查配置", 'filehelper')
+            return False

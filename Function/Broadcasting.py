@@ -54,7 +54,7 @@ class Broadcasting:
         elif uin.lower() in ["n", "no"]:
             itchat.send(Broadcasting.info_exit, 'filehelper')
             return "FALSE"
-        uinput = list(filter(None, [e.strip() for e in uin.split("#")]))
+        uinput = list(filter(None, [e.strip() for e in uin.split("@")]))
         if len(uinput) == 0:
             if self.wrong_time < 2:
                 itchat.send(Broadcasting.warn_wrong_input, 'filehelper')
@@ -100,7 +100,7 @@ class Broadcasting:
         for name in v_in:
             message += "\n%s   %s" % (counter, name)
             counter += 1
-        message += "\n您可以直接输入号码删除被发送的联系人（多个号码请用#隔开），如果确认请回复Y，如果退出请回复N"
+        message += "\n您可以直接输入号码删除被发送的联系人（多个号码请用@隔开），如果确认请回复Y，如果退出请回复N"
         itchat.send(message, 'filehelper')
 
     def __get_condition(self, content_list):
@@ -140,7 +140,6 @@ class Broadcasting:
             if len(temp) > 0:
                 for uid in temp:
                     self.udict_fin.pop(uid)
-                    # self.udict_fin[uid] = self.udict_all[uid]
             else:
                 return
         else:
