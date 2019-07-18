@@ -26,6 +26,8 @@ class Broadcasting:
     info_remove = prefix + "已移除：  %s"
 
     def broadcasting_prepare(self, content_list):
+        if len(content_list) == 0:
+            return "FALSE"
         self.content = content_list.pop()
         users_dict = itchat.get_friends(update=True)
         for user in users_dict:
@@ -135,7 +137,7 @@ class Broadcasting:
         if len(self.only_list) > 0:
             for e in self.only_list:
                 for uid, uname in self.udict_fin.items():
-                    if e not in uname:
+                    if e not in uname and uid not in temp:
                         temp.append(uid)
             if len(temp) > 0:
                 for uid in temp:
