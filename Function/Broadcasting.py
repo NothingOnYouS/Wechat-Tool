@@ -107,13 +107,13 @@ class Broadcasting:
 
     def __get_condition(self, content_list):
         for element in content_list:
-            match = re.match("去除([:：])", element)
+            match = re.match("去除([:：])?", element)
             if match:
                 self.except_list = list(filter(None, [e.strip() for e in element[match.end():].split("@",)]))
-            match = re.match("仅包括([:：])", element)
+            match = re.match("仅包括([:：])?", element)
             if match:
                 self.only_list = list(filter(None, [e.strip() for e in element[match.end():].split("@")]))
-            match = re.match("加上([:：])", element)
+            match = re.match("加上([:：])?", element)
             if match:
                 self.add_list = list(filter(None, [e.strip() for e in element[match.end():].split("@")]))
 

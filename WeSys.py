@@ -25,7 +25,10 @@ class WeSys:
 
     @staticmethod
     def fh_continue_previous_task(argv):
-        result = WeSys.fh_func(argv)
+        try:
+            result = WeSys.fh_func(argv)
+        except Exception:
+            result = "FALSE"
         c_method_name = WeSys.fh_funct_dict[WeSys.fh_func.__name__][result]
         if c_method_name is not None:
             WeSys.fh_func = getattr(WeSys.fh_obj, WeSys.fh_funct_dict[WeSys.fh_func.__name__][result])
