@@ -1,7 +1,10 @@
+import collections
 import copy
 import re
 
 import itchat
+
+from System.Sys import Sys
 
 
 class Broadcasting:
@@ -16,7 +19,7 @@ class Broadcasting:
 
     wrong_time = 0
 
-    prefix = "（群发模式）"
+    prefix = "(群发模式)"
     warn_wrong_input = prefix + "非法输入，满三次错误以后将退出群发模式。或输入\"n\"直接退出"
     warn_wrong_number = prefix + "数字输入错误%s"
     warn_exit = prefix + "非法输入，第三次！退出群发模式！"
@@ -29,10 +32,17 @@ class Broadcasting:
         if len(content_list) == 0:
             return "FALSE"
         self.content = content_list.pop()
+
         users_dict = itchat.get_friends(update=True)
         for user in users_dict:
             self.udict_fin[user["UserName"]] = user["RemarkName"] if user["RemarkName"] != "" else user["NickName"]
+        temp = {}
+        for key, value in sorted(self.udict_fin.items(), key=lambda x: x[1]):
+            temp[key] = value
+        self.udict_fin = temp
+        self.udict_fin.pop(Sys.my_uid)
         self.udict_all = copy.deepcopy(self.udict_fin)
+
         self.__get_condition(content_list)
         for func in [self.__process_except, self.__process_only, self.__process_add]:
             func()
@@ -109,7 +119,7 @@ class Broadcasting:
         for element in content_list:
             match = re.match("去除([:：])?", element)
             if match:
-                self.except_list = list(filter(None, [e.strip() for e in element[match.end():].split("@",)]))
+                self.except_list = list(filter(None, [e.strip() for e in element[match.end():].split("@", )]))
             match = re.match("仅包括([:：])?", element)
             if match:
                 self.only_list = list(filter(None, [e.strip() for e in element[match.end():].split("@")]))
